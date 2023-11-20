@@ -20,12 +20,12 @@ regd_users.post("/login", (req,res) => {
     const { username, password } = req.body.username;
     if(isValid(username) && authenticatedUser(username, password)){
         const accessToken = jwt.sign({ username }, 'ASDF');
-        req.session.data.accessToken = accessToken;
+        req.session['accessToken'] = accessToken;
 
         return res.status(200)
             .send(JSON.stringify('You logged in successfully'));
     }
-    return res.status(400).json("You aren't registered to the system");
+    return res.status(400).json("Customer successfully logged in");
 });
 
 // Add a book review
@@ -40,7 +40,8 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
     }
     book.reviews = { ...book.reviews, [username]: review };
 
-    return res.status(200).json(JSON.stringify(book.reviews));
+    return res.status(200)
+        .send(`The review for the book with ISBN ${isbn} has been added/deleted`);
 });
 
 regd_users.delete("/auth/review/:isbn"), (req, res) => {
@@ -51,13 +52,12 @@ regd_users.delete("/auth/review/:isbn"), (req, res) => {
         return res.status(404)
             .send(JSON.stringify(`There is no book with isbn: ${isbn}`));
     }
-    const reviewsWithoutReviewerReview = 
-        Object.keys(book.reviews)
-                .filter(reviewer => reviewer !== username);
-    book.reviews = reviewsWithoutReviewerReview;
+    
+    delete book.reviews[username];
 
     return res.status(200)
-        .send('You have deleted your reveiw successfully')
+    .send(
+        `Reviews for book with ISBN ${isbn} posted by the user ${username} deleted`)
 }
 
 module.exports.authenticated = regd_users;

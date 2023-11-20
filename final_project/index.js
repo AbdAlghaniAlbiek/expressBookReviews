@@ -11,7 +11,7 @@ app.use(express.json());
 app.use("/customer",session({secret:"fingerprint_customer",resave: true, saveUninitialized: true}))
 
 app.use("/customer/auth/*", function auth(req,res,next){
-    const accessToken = req.session?.data?.accessToken;
+    const accessToken = req.session?.accessToken;
     if(!accessToken) {
         res.status(401).send("You aren't authenticated");
     }

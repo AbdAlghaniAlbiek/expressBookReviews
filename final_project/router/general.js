@@ -18,12 +18,12 @@ public_users.post("/register", (req,res) => {
         users.find(user => user.usename === username);
     if(isUserNameAlreadyExist) {
         return res.status(400)
-        .send('There is another user with the same username');
+        .send('There is another customer with the same username');
     }
 
     users.push({ username, password });
     return res.status(200)
-    .send('You have registered successfully');
+    .send('Customer successfully registered, you can now login');
 });
 
 // Get the book list available in the shop
@@ -68,19 +68,21 @@ public_users.get('/isbn/:isbn',async function (req, res) {
 public_users.get('/author/:author',async function (req, res) {
     const getBookByAuthor = (author) => {
         return new Promise((resolve, reject) => {
-            const book = Object.values(books)
-                .find(b => b.author === author);
-            if(!book) {
+            const booksByAuthor = Object.values(books)
+                .filter(b => b.author === author);
+            if(booksByAuthor.length === 0) {
                 reject(`Not found any book with author: ${author}`)
             }
-            resolve(book)
+            resolve(booksByAuthor)
         });
     }
 
     const author = req.params.author
     try {
-        const book = await getBookByAuthor(author)
-        return res.status(200).send(JSON.stringify(book));
+        const booksByAuthor = await getBookByAuthor(author)
+        return res.status(200).send(JSON.stringify({
+            booksByAuthor
+        }));
     } catch(err) {
         return res.status(400).send(`${err}`);
     }
@@ -90,19 +92,21 @@ public_users.get('/author/:author',async function (req, res) {
 public_users.get('/title/:title', async function (req, res) {
     const getBookByTitle = (title) => {
         return new Promise((resolve, reject) => {
-            const book = Object.values(books)
-                .find(b => b.title === title);
-            if(!book) {
+            const booksByTitle = Object.values(books)
+                .filter(b => b.title === title);
+            if(booksByTitle.length === 0) {
                 reject(`Not found any book with title: ${title}`)
             }
-            resolve(book)
+            resolve(booksByTitle)
         });
     }
 
     const title = req.params.title
     try {
-        const book = await getBookByTitle(title)
-        return res.status(200).send(JSON.stringify(book));
+        const booksByTitle = await getBookByTitle(title)
+        return res.status(200).send(JSON.stringify({
+            booksByTitle
+        }));
     } catch(err) {
         return res.status(400).send(`${err}`);
     }
