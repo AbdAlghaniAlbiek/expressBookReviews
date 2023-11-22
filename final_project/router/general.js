@@ -36,7 +36,9 @@ public_users.get('/', async function (req, res) {
 
     try {
         const allBooks = await getBooks()
-        return res.status(200).send(JSON.stringify(allBooks));
+        return res.status(200).send(JSON.stringify({
+            books: allBooks
+        }));
     } catch(err) {
         return res.status(400).send(`${err}`);
     }
@@ -47,7 +49,7 @@ public_users.get('/', async function (req, res) {
 public_users.get('/isbn/:isbn',async function (req, res) {
     const getBookByIsbn = (isbn) => {
         return new Promise((resolve, reject) => {
-            const book = Object.values(books).find(b => b.isbn === isbn);
+            const book = books[isbn];
             if(!book) {
                 reject(`Not found any book with isbn: ${isbn}`)
             }
@@ -68,8 +70,17 @@ public_users.get('/isbn/:isbn',async function (req, res) {
 public_users.get('/author/:author',async function (req, res) {
     const getBookByAuthor = (author) => {
         return new Promise((resolve, reject) => {
-            const booksByAuthor = Object.values(books)
-                .filter(b => b.author === author);
+            let booksByAuthor = [];
+            for (let i = 1; i <= Object.keys(books).length; i++) {
+                const book = books[i];
+                if(book.author === author)
+                booksByAuthor.push({
+                    isbn: i,
+                    title: book.title,
+                    reviews: book.reviews
+                });
+                
+            }
             if(booksByAuthor.length === 0) {
                 reject(`Not found any book with author: ${author}`)
             }
@@ -92,8 +103,17 @@ public_users.get('/author/:author',async function (req, res) {
 public_users.get('/title/:title', async function (req, res) {
     const getBookByTitle = (title) => {
         return new Promise((resolve, reject) => {
-            const booksByTitle = Object.values(books)
-                .filter(b => b.title === title);
+            let booksByTitle = [];
+            for (let i = 1; i <= Object.keys(books).length; i++) {
+                const book = books[i];
+                if(book.title === title)
+                booksByTitle.push({
+                    isbn: i,
+                    author: book.author,
+                    reviews: book.reviews
+                });
+                
+            }
             if(booksByTitle.length === 0) {
                 reject(`Not found any book with title: ${title}`)
             }
@@ -115,9 +135,7 @@ public_users.get('/title/:title', async function (req, res) {
 //  Get book review
 public_users.get('/review/:isbn',function (req, res) {
     const isbn = +req.params.isbn
-    const book = Object
-        .values(books)
-        .find(b => b.isbn === isbn);
+    const book = books[isbn]
 
     if(!book) {
         return res

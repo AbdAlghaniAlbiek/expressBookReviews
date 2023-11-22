@@ -17,23 +17,23 @@ const authenticatedUser = (username,password)=>{
     return false;
 }
 regd_users.post("/login", (req,res) => {
-    const { username, password } = req.body.username;
+    const { username, password } = req.body;
     if(isValid(username) && authenticatedUser(username, password)){
         const accessToken = jwt.sign({ username }, 'ASDF');
         req.session['accessToken'] = accessToken;
 
         return res.status(200)
-            .send(JSON.stringify('You logged in successfully'));
+            .send(JSON.stringify('Customer successfully logged in'));
     }
-    return res.status(400).json("Customer successfully logged in");
+    return res.status(400).json("Your credentials aren't correct");
 });
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
     const username = req.username;
-    const isbn = +req.params.isbn;
+    const isbn = req.params.isbn;
     const review = req.query.review;
-    let book = Object.values(books).find(book => book.isbn === isbn);
+    let book = books[isbn];
     if(!book) {
         return res.status(404)
             .send(JSON.stringify(`There is no book with isbn ${username}`))
@@ -47,7 +47,7 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
 regd_users.delete("/auth/review/:isbn"), (req, res) => {
     const username = req.username;
     const isbn = +req.params.isbn;
-    const book = Object.values(books).find(book => book.isbn === isbn);
+    const book = books[isbn]
     if(!book) {
         return res.status(404)
             .send(JSON.stringify(`There is no book with isbn: ${isbn}`));
