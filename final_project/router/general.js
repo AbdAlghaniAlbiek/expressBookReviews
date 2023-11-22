@@ -23,7 +23,9 @@ public_users.post("/register", (req,res) => {
 
     users.push({ username, password });
     return res.status(200)
-    .send('Customer successfully registered, you can now login');
+    .send({
+        message: 'Customer successfully registered, you can now login'
+    });
 });
 
 // Get the book list available in the shop

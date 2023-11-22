@@ -38,7 +38,7 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
         return res.status(404)
             .send(JSON.stringify(`There is no book with isbn ${username}`))
     }
-    book.reviews = { ...book.reviews, [username]: review };
+    book.reviews[username] = review
 
     return res.status(200)
         .send(`The review for the book with ISBN ${isbn} has been added/updated`);
